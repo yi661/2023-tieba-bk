@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发帖 - 百度贴吧</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #333;
+            padding: 0.5rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007AFF;
+            text-decoration: none;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-disabled {
+            background: #ccc;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        /* 发帖表单 */
+        .post-form {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            border-color: #007AFF;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+        }
+        
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+            line-height: 1.5;
+        }
+        
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8.825L1.175 4 2.238 2.938 6 6.7l3.763-3.762L10.825 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+        
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .tool-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+        
+        /* 附件上传 */
+        .upload-section {
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #007AFF;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #ccc;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-text {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .upload-btn {
+            background: #007AFF;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .file-icon {
+            font-size: 1.5rem;
+            color: #007AFF;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .file-size {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .file-remove {
+            background: none;
+            border: none;
+            color: #ff4757;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        /* 预览区域 */
+        .preview-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .preview-title {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            min-height: 100px;
+        }
+        
+        /* 底部操作栏 */
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            padding: 1rem 0;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .post-form {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            
+            .nav-actions {
+                display: none;
+            }
+            
+            .action-bar {
+                padding: 0.75rem 1rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+        
+        /* 字符计数 */
+        .char-count {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+        
+        .char-count.warning {
+            color: #ffa502;
+        }
+        
+        .char-count.error {
+            color: #ff4757;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <button class="back-btn">←</button>
+                    <a href="#" class="logo">百度贴吧</a>
+                </div>
+                
+                <div class="nav-actions">
+                    <button class="btn btn-secondary">草稿</button>
+                    <button class="btn btn-primary" id="publish-btn">发布</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 发帖表单 -->
+    <div class="container">
+        <div class="post-form">
+            <!-- 选择贴吧 -->
+            <div class="form-group">
+                <label class="form-label">选择贴吧</label>
+                <select class="form-input form-select">
+                    <option value="">请选择贴吧</option>
+                    <option value="game" selected>游戏吧</option>
+                    <option value="anime">动漫吧</option>
+                    <option value="tech">科技吧</option>
+                    <option value="study">学习吧</option>
+                </select>
+            </div>
+
+            <!-- 帖子标题 -->
+            <div class="form-group">
+                <label class="form-label">帖子标题</label>
+                <input type="text" class="form-input" placeholder="请输入帖子标题（最多50字）" maxlength="50" id="post-title">
+                <div class="char-count" id="title-count">0/50</div>
+            </div>
+
+            <!-- 帖子内容 -->
+            <div class="form-group">
+                <label class="form-label">帖子内容</label>
+                
+                <!-- 工具栏 -->
+                <div class="toolbar">
+                    <button class="tool-btn" title="加粗">𝐁</button>
+                    <button class="tool-btn" title="斜体">𝐼</button>
+                    <button class="tool-btn" title="下划线">𝐔</button>
+                    <button class="tool-btn" title="插入图片">🖼️</button>
+                    <button class="tool-btn" title="插入链接">🔗</button>
+                    <button class="tool-btn" title="表情">😊</button>
+                    <button class="tool-btn" title="代码">&lt;/&gt;</button>
+                </div>
+                
+                <textarea class="form-input form-textarea" placeholder="请输入帖子内容..." id="post-content"></textarea>
+                <div class="char-count" id="content-count">0/2000</div>
+            </div>
+
+            <!-- 附件上传 -->
+            <div class="form-group">
+                <label class="form-label">附件上传</label>
+                <div class="upload-section" id="upload-area">
+                    <div class="upload-icon">📎</div>
+                    <div class="upload-text">点击或拖拽文件到此处上传</div>
+                    <button class="upload-btn">选择文件</button>
+                    <input type="file" id="file-input" multiple style="display: none;">
+                </div>
+                
+                <div class="file-list" id="file-list">
+                    <!-- 文件列表将在这里动态生成 -->
+                </div>
+            </div>
+
+            <!-- 帖子类型 -->
+            <div class="form-group">
+                <label class="form-label">帖子类型</label>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" name="post-type" value="discussion" checked>
+                        <span>讨论</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" name="post-type" value="question">
+                        <span>求助</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" name="post-type" value="share">
+                        <span>分享</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="radio" name="post-type" value="news">
+                        <span>资讯</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section">
+                <div class="preview-title">预览</div>
+                <div class="preview-content" id="preview-content">
+                    帖子内容将在这里预览...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部操作栏（移动端） -->
+    <div class="action-bar" style="display: none;">
+        <button class="btn btn-secondary">草稿</button>
+        <button class="btn btn-primary" id="mobile-publish-btn">发布</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 字符计数
+            const titleInput = document.getElementById('post-title');
+            const contentInput = document.getElementById('post-content');
+            const titleCount = document.getElementById('title-count');
+            const contentCount = document.getElementById('content-count');
+            const previewContent = document.getElementById('preview-content');
+            
+            // 标题字符计数
+            titleInput.addEventListener('input', function() {
+                const count = this.value.length;
+                titleCount.textContent = `${count}/50`;
+                
+                if (count > 45) {
+                    titleCount.className = 'char-count warning';
+                } else if (count > 50) {
+                    titleCount.className = 'char-count error';
+                } else {
+                    titleCount.className = 'char-count';
+                }
+                
+                updatePreview();
+            });
+            
+            // 内容字符计数和预览
+            contentInput.addEventListener('input', function() {
+                const count = this.value.length;
+                contentCount.textContent = `${count}/2000`;
+                
+                if (count > 1800) {
+                    contentCount.className = 'char-count warning';
+                } else if (count > 2000) {
+                    contentCount.className = 'char-count error';
+                } else {
+                    contentCount.className = 'char-count';
+                }
+                
+                updatePreview();
+            });
+            
+            // 更新预览
+            function updatePreview() {
+                const title = titleInput.value || '无标题';
+                const content = contentInput.value || '暂无内容';
+                
+                previewContent.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 0.5rem; font-size: 1.1rem;">${title}</div>
+                    <div style="color: #666; line-height: 1.5;">${content.replace(/\n/g, '<br>')}</div>
+                `;
+            }
+            
+            // 文件上传功能
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+            const fileList = document.getElementById('file-list');
+            
+            uploadArea.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#007AFF';
+                this.style.background = '#f0f8ff';
+            });
+            
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#e0e0e0';
+                this.style.background = 'white';
+            });
+            
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderColor = '#e0e0e0';
+                this.style.background = 'white';
+                
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+            
+            fileInput.addEventListener('change', function() {
+                handleFiles(this.files);
+            });
+            
+            function handleFiles(files) {
+                for (let file of files) {
+                    if (file.size > 10 * 1024 * 1024) { // 10MB限制
+                        alert(`文件 ${file.name} 超过10MB限制`);
+                        continue;
+                    }
+                    
+                    addFileToList(file);
+                }
+            }
+            
+            function addFileToList(file) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">${file.name}</div>
+                        <div class="file-size">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button class="file-remove" onclick="this.parentElement.remove()">×</button>
+                `;
+                
+                fileList.appendChild(fileItem);
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // 发布按钮状态
+            const publishBtn = document.getElementById('publish-btn');
+            const mobilePublishBtn = document.getElementById('mobile-publish-btn');
+            
+            function updatePublishButton() {
+                const hasTitle = titleInput.value.trim().length > 0;
+                const hasContent = contentInput.value.trim().length > 0;
+                const isValid = hasTitle && hasContent;
+                
+                if (isValid) {
+                    publishBtn.className = 'btn btn-primary';
+                    mobilePublishBtn.className = 'btn btn-primary';
+                } else {
+                    publishBtn.className = 'btn btn-disabled';
+                    mobilePublishBtn.className = 'btn btn-disabled';
+                }
+            }
+            
+            titleInput.addEventListener('input', updatePublishButton);
+            contentInput.addEventListener('input', updatePublishButton);
+            
+            // 发布功能
+            publishBtn.addEventListener('click', function() {
+                if (this.className.includes('btn-disabled')) return;
+                
+                const title = titleInput.value.trim();
+                const content = contentInput.value.trim();
+                
+                if (!title || !content) {
+                    alert('请填写标题和内容');
+                    return;
+                }
+                
+                alert('帖子发布成功！');
+                // 这里可以添加实际的发布逻辑
+            });
+            
+            // 返回按钮
+            const backBtn = document.querySelector('.back-btn');
+            backBtn.addEventListener('click', function() {
+                if (titleInput.value || contentInput.value) {
+                    if (confirm('您有未保存的内容，确定要返回吗？')) {
+                        alert('返回上一页');
+                    }
+                } else {
+                    alert('返回上一页');
+                }
+            });
+            
+            // 移动端适配
+            if (window.innerWidth <= 768) {
+                document.querySelector('.action-bar').style.display = 'flex';
+                document.querySelector('.nav-actions').style.display = 'none';
+            }
+            
+            // 初始化预览
+            updatePreview();
+            updatePublishButton();
+        });
+    </script>
+</body>
+</html>

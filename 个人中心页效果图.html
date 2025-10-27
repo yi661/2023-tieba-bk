@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 百度贴吧</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* 导航栏样式 */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007AFF;
+            text-decoration: none;
+        }
+        
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        /* 用户信息头部 */
+        .user-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 2rem;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .user-details {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-level {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .user-stats {
+            display: flex;
+            gap: 2rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .user-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn-edit {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-edit:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* 主要内容区域 */
+        .main-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* 侧边栏菜单 */
+        .sidebar {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .menu-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #333;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #333;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: #007AFF;
+            color: white;
+        }
+        
+        .menu-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 内容区域 */
+        .content-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .view-more {
+            color: #007AFF;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        /* 帖子网格 */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .posts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .post-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .post-card:hover {
+            border-color: #007AFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .post-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .post-content {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .post-stats {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .post-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        /* 关注贴吧 */
+        .tieba-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+        
+        .tieba-item {
+            text-align: center;
+            padding: 1rem 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+        }
+        
+        .tieba-item:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .tieba-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin: 0 auto 0.5rem;
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .tieba-name {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .tieba-members {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        /* 消息列表 */
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .message-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .message-item:hover {
+            border-color: #007AFF;
+            background: #f8f9fa;
+        }
+        
+        .message-item.unread {
+            background: #f0f8ff;
+            border-color: #007AFF;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+        
+        .message-content {
+            flex: 1;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .message-text {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .message-time {
+            font-size: 0.8rem;
+            color: #999;
+            white-space: nowrap;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        
+        .nav-item {
+            text-align: center;
+            padding: 0.5rem;
+            color: #999;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        
+        .nav-item.active {
+            color: #007AFF;
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-nav {
+                display: block;
+            }
+            
+            .nav-actions {
+                display: none;
+            }
+            
+            .user-info {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .user-actions {
+                justify-content: center;
+            }
+            
+            .user-avatar {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .user-name {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-container">
+                <a href="#" class="logo">百度贴吧</a>
+                
+                <div class="nav-actions">
+                    <button class="btn btn-secondary">设置</button>
+                    <button class="btn btn-primary">退出</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 用户信息头部 -->
+    <section class="user-header">
+        <div class="container">
+            <div class="user-info">
+                <div class="user-avatar">张</div>
+                <div class="user-details">
+                    <h1 class="user-name">张三</h1>
+                    <div class="user-level">LV.12 贴吧达人</div>
+                    <div class="user-stats">
+                        <span>关注：128</span>
+                        <span>粉丝：256</span>
+                        <span>帖子：512</span>
+                        <span>获赞：1.2万</span>
+                    </div>
+                </div>
+                <div class="user-actions">
+                    <button class="btn-edit">编辑资料</button>
+                    <button class="btn-edit">消息设置</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容区域 -->
+    <div class="container">
+        <div class="main-content">
+            <!-- 侧边栏菜单 -->
+            <div class="sidebar">
+                <div class="menu-title">个人中心</div>
+                <div class="menu-list">
+                    <a href="#" class="menu-item active">
+                        <span class="menu-icon">📝</span>
+                        <span>我的帖子</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">💬</span>
+                        <span>我的回复</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">⭐</span>
+                        <span>我的收藏</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">👥</span>
+                        <span>关注贴吧</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">🔔</span>
+                        <span>消息通知</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">⚙️</span>
+                        <span>账号设置</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">🛡️</span>
+                        <span>隐私设置</span>
+                    </a>
+                    <a href="#" class="menu-item">
+                        <span class="menu-icon">📊</span>
+                        <span>数据统计</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">我的帖子</h2>
+                    <a href="#" class="view-more">查看全部</a>
+                </div>
+                
+                <div class="posts-grid">
+                    <div class="post-card">
+                        <div class="post-title">【讨论】大家最近在玩什么游戏？</div>
+                        <div class="post-content">最近发现了一款不错的独立游戏，画面精美，玩法创新，有没有一起玩的？</div>
+                        <div class="post-meta">
+                            <div class="post-stats">
+                                <div class="post-stat">👍 128</div>
+                                <div class="post-stat">💬 56</div>
+                            </div>
+                            <div class="post-time">2小时前</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-card">
+                        <div class="post-title">【分享】学习编程的心得体会</div>
+                        <div class="post-content">自学编程半年，分享一些学习经验和资源，希望对初学者有帮助。</div>
+                        <div class="post-meta">
+                            <div class="post-stats">
+                                <div class="post-stat">👍 256</div>
+                                <div class="post-stat">💬 89</div>
+                            </div>
+                            <div class="post-time">5小时前</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-card">
+                        <div class="post-title">【求助】电脑蓝屏问题如何解决？</div>
+                        <div class="post-content">最近电脑频繁蓝屏，错误代码0x0000007B，有没有大神知道怎么解决？</div>
+                        <div class="post-meta">
+                            <div class="post-stats">
+                                <div class="post-stat">👍 89</div>
+                                <div class="post-stat">💬 45</div>
+                            </div>
+                            <div class="post-time">1天前</div>
+                        </div>
+                    </div>
+                    
+                    <div class="post-card">
+                        <div class="post-title">【攻略】最新版本英雄强度分析</div>
+                        <div class="post-content">新版本更新后，哪些英雄值得练？哪些被削弱了？一起来讨论吧！</div>
+                        <div class="post-meta">
+                            <div class="post-stats">
+                                <div class="post-stat">👍 156</div>
+                                <div class="post-stat">💬 78</div>
+                            </div>
+                            <div class="post-time">2天前</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 移动端底部导航 -->
+    <nav class="bottom-nav">
+        <div class="nav-items">
+            <a href="#" class="nav-item">
+                <div>🏠</div>
+                <div>首页</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div>🔍</div>
+                <div>发现</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div>✏️</div>
+                <div>发帖</div>
+            </a>
+            <a href="#" class="nav-item">
+                <div>💬</div>
+                <div>消息</div>
+            </a>
+            <a href="#" class="nav-item active">
+                <div>👤</div>
+                <div>我的</div>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 菜单项点击效果
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    
+                    // 添加active类到当前项
+                    this.classList.add('active');
+                    
+                    // 根据菜单项更新内容区域
+                    const menuText = this.querySelector('span:last-child').textContent;
+                    const sectionTitle = document.querySelector('.section-title');
+                    sectionTitle.textContent = menuText;
+                    
+                    // 这里可以添加根据菜单项切换内容的逻辑
+                    alert(`切换到${menuText}页面`);
+                });
+            });
+            
+            // 帖子卡片点击效果
+            const postCards = document.querySelectorAll('.post-card');
+            postCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    alert('查看帖子详情');
+                });
+            });
+            
+            // 编辑资料按钮
+            const editBtn = document.querySelector('.btn-edit');
+            editBtn.addEventListener('click', function() {
+                alert('打开编辑资料页面');
+            });
+            
+            // 设置按钮
+            const settingsBtn = document.querySelector('.btn-secondary');
+            settingsBtn.addEventListener('click', function() {
+                alert('打开设置页面');
+            });
+            
+            // 退出按钮
+            const logoutBtn = document.querySelector('.btn-primary');
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('确定要退出登录吗？')) {
+                    alert('退出登录成功');
+                }
+            });
+            
+            // 移动端适配
+            if (window.innerWidth <= 768) {
+                document.querySelector('.nav-actions').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
